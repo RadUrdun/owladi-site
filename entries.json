@@ -37,12 +37,12 @@
       "slug": "identity-for-agents",
       "title": "Identity stops being a human-control problem",
       "type": "Idea",
-      "dek": "If most of the actions inside an enterprise are soon taken by agents rather than people, what does \"identity\" even mean anymore?",
-      "topic": "AI & Agents",
       "readTime": "",
-      "dateStr": "9 September 2026",
+      "topic": "AI & Agents",
+      "dek": "If most of the actions inside an enterprise are soon taken by agents rather than people, what does \"identity\" even mean anymore?",
+      "body": "Most identity and access frameworks were built on a quiet assumption: the actor behind a login is a person, and a person can be trained, warned, or fired. Once a meaningful share of actions inside an enterprise are taken by autonomous agents instead, that assumption stops holding.\n\nAn agent doesn't get \"trained\" in the disciplinary sense, and it can act at a speed and volume no human reviewer can shadow in real time. So what replaces the old controls... behavioural baselining? Revocable, scoped credentials issued per task rather than per person? Something else entirely?\n\nWorth sitting with rather than answering too quickly.",
       "disclosure": true,
-      "body": "Most identity and access frameworks were built on a quiet assumption: the actor behind a login is a person, and a person can be trained, warned, or fired. Once a meaningful share of actions inside an enterprise are taken by autonomous agents instead, that assumption stops holding.\n\nAn agent doesn't get \"trained\" in the disciplinary sense, and it can act at a speed and volume no human reviewer can shadow in real time. So what replaces the old controls — behavioural baselining? Revocable, scoped credentials issued per task rather than per person? Something else entirely?\n\nWorth sitting with rather than answering too quickly."
+      "dateStr": "9 September 2026"
     },
     {
       "slug": "governance-theatre",
