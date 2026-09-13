@@ -1,6 +1,17 @@
 {
   "entries": [
     {
+      "slug": "entry",
+      "title": "متر يبرئ؟",
+      "type": "Idea",
+      "dek": "سألوا الغمد \"متى يلتام جرحك؟\" فبكى السيف.",
+      "topic": "",
+      "readTime": "",
+      "dateStr": "13 September 2026",
+      "disclosure": true,
+      "body": "سألوا الغمد \"متى يلتام جرحك؟\" فبكى السيف."
+    },
+    {
       "slug": "trust-as-an-engineering-discipline",
       "title": "Trust is becoming an engineering discipline",
       "type": "Reflection",

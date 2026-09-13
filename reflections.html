@@ -48,7 +48,7 @@
       <li class="entry-row idea" data-type="Idea">
         <p class="entry-kicker">Idea</p>
         <h2><a href="entry.html">متر يبرئ؟</a></h2>
-        <p class="entry-dek">سألوا الغمد "متى يلتام جرحك؟" فبكى السيف.</p>
+        <p class="entry-dek">سألوا الغمد &quot;متى يلتام جرحك؟&quot; فبكى السيف.</p>
         <p class="entry-meta">13 September 2026</p>
       </li>
 
@@ -62,7 +62,7 @@
       <li class="entry-row idea" data-type="Idea">
         <p class="entry-kicker">Idea</p>
         <h2><a href="identity-for-agents.html">Identity stops being a human-control problem</a></h2>
-        <p class="entry-dek">If most of the actions inside an enterprise are soon taken by agents rather than people, what does "identity" even mean anymore?</p>
+        <p class="entry-dek">If most of the actions inside an enterprise are soon taken by agents rather than people, what does &quot;identity&quot; even mean anymore?</p>
         <p class="entry-meta">9 September 2026 · AI &amp; Agents</p>
       </li>
 
@@ -89,7 +89,6 @@
   var links = document.querySelectorAll('.filters a');
   var rows = document.querySelectorAll('.entry-list .entry-row');
   var empty = document.getElementById('emptyState');
-
   function applyFilter(type) {
     var visible = 0;
     rows.forEach(function (row) {
@@ -99,7 +98,6 @@
     });
     empty.style.display = visible === 0 ? '' : 'none';
   }
-
   links.forEach(function (link) {
     link.addEventListener('click', function (e) {
       e.preventDefault();
