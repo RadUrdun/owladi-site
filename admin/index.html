@@ -309,6 +309,20 @@
 '<meta name="viewport" content="width=device-width, initial-scale=1.0">\n' +
 '<title>' + escapeHtml(opts.title) + ' — Raddad Ayoub</title>\n' +
 '<meta name="description" content="' + escapeHtml(opts.dek) + '">\n' +
+'<link rel="icon" href="/favicon.svg" type="image/svg+xml">\n' +
+'<link rel="icon" href="/favicon.ico" sizes="any">\n' +
+'<link rel="apple-touch-icon" href="/apple-touch-icon.png">\n' +
+'<link rel="canonical" href="https://owladi.com/' + opts.slug + '.html">\n' +
+'<meta property="og:type" content="article">\n' +
+'<meta property="og:site_name" content="Raddad Ayoub">\n' +
+'<meta property="og:title" content="' + escapeHtml(opts.title) + '">\n' +
+'<meta property="og:description" content="' + escapeHtml(opts.dek) + '">\n' +
+'<meta property="og:url" content="https://owladi.com/' + opts.slug + '.html">\n' +
+'<meta property="og:image" content="https://owladi.com/og-image.png">\n' +
+'<meta name="twitter:card" content="summary_large_image">\n' +
+'<meta name="twitter:title" content="' + escapeHtml(opts.title) + '">\n' +
+'<meta name="twitter:description" content="' + escapeHtml(opts.dek) + '">\n' +
+'<meta name="twitter:image" content="https://owladi.com/og-image.png">\n' +
 '<link rel="stylesheet" href="style.css">\n' +
 '</head>\n' +
 '<body>\n' +
@@ -348,12 +362,20 @@ disclosureHtml + '\n' +
     var href = forHomepage ? '/' + opts.slug + '.html' : opts.slug + '.html';
     var metaText = forHomepage ? opts.dateStr : (opts.topic ? opts.dateStr + ' · ' + opts.topic : opts.dateStr);
 
-    return '      <li class="' + rowClass + '">\n' +
+    return '      <li class="' + rowClass + '" data-type="' + opts.type + '">\n' +
 '        <p class="entry-kicker">' + escapeHtml(kicker) + '</p>\n' +
 '        <h2><a href="' + href + '">' + escapeHtml(opts.title) + '</a></h2>\n' +
 '        <p class="entry-dek">' + escapeHtml(opts.dek) + '</p>\n' +
 '        <p class="entry-meta">' + metaText + '</p>\n' +
 '      </li>';
+  }
+
+  function insertSitemapUrl(xml, url) {
+    var closeTag = '</urlset>';
+    var idx = xml.indexOf(closeTag);
+    if (idx === -1) throw new Error('Could not find </urlset> in sitemap.xml');
+    var entry = '  <url><loc>' + url + '</loc></url>\n';
+    return xml.slice(0, idx) + entry + xml.slice(idx);
   }
 
   function insertIntoList(html, listItemHtml, cap) {
@@ -419,6 +441,15 @@ disclosureHtml + '\n' +
         .then(function (refl) {
           var updated = insertIntoList(refl.content, buildListItem(opts, false), null);
           return putFile('reflections.html', updated, refl.sha, 'Update reflections archive: ' + title);
+        })
+        .then(function () {
+          showStatus('busy', 'Reflections archive updated. Updating sitemap…');
+          return getFile('sitemap.xml').catch(function () { return null; });
+        })
+        .then(function (sm) {
+          if (!sm) return;
+          var updated = insertSitemapUrl(sm.content, 'https://owladi.com/' + slug + '.html');
+          return putFile('sitemap.xml', updated, sm.sha, 'Update sitemap: ' + title);
         })
         .then(function () {
           showStatus('ok', 'Published. "' + title + '" is live at owladi.com/' + slug + '.html within a minute or two.');

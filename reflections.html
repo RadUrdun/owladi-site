@@ -5,6 +5,20 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Reflections — Raddad Ayoub</title>
 <meta name="description" content="Short reflections, notes, and ideas on trust, technology, organisations, and leadership.">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="canonical" href="https://owladi.com/reflections.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Raddad Ayoub">
+<meta property="og:title" content="Reflections — Raddad Ayoub">
+<meta property="og:description" content="Short reflections, notes, and ideas on trust, technology, organisations, and leadership.">
+<meta property="og:url" content="https://owladi.com/reflections.html">
+<meta property="og:image" content="https://owladi.com/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Reflections — Raddad Ayoub">
+<meta name="twitter:description" content="Short reflections, notes, and ideas on trust, technology, organisations, and leadership.">
+<meta name="twitter:image" content="https://owladi.com/og-image.png">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -12,7 +26,7 @@
 
   <header class="site">
     <p class="name"><a href="/">Raddad Ayoub</a></p>
-    <p class="tagline">Reflections on trust, technology, organisations, and the things I am still trying to understand.</p>
+    <p class="tagline">Reflections on trust, technology, organisations, poetry, art, and the things I am still trying to understand.</p>
     <nav class="site">
       <a href="/reflections.html" class="current">Reflections</a>
       <a href="/writing.html">Writing</a>
@@ -23,36 +37,29 @@
 
   <main>
     <p class="filters">
-      <a href="#" class="active">All</a>
-      <a href="#">Reflections</a>
-      <a href="#">Notes</a>
-      <a href="#">Ideas</a>
+      <a href="#" class="active" data-filter="all">All</a>
+      <a href="#" data-filter="Reflection">Reflections</a>
+      <a href="#" data-filter="Note">Notes</a>
+      <a href="#" data-filter="Idea">Ideas</a>
     </p>
 
     <ul class="entry-list">
 
-      <li class="entry-row">
-        <p class="entry-kicker">Reflection</p>
-        <h2><a href="arabic-poetry.html">Arabic Poetry</a></h2>
-        <p class="entry-dek">Test</p>
-        <p class="entry-meta">13 September 2026</p>
-      </li>
-
-      <li class="entry-row">
+      <li class="entry-row" data-type="Reflection">
         <p class="entry-kicker">Reflection · 3 min</p>
         <h2><a href="trust-as-an-engineering-discipline.html">Trust is becoming an engineering discipline</a></h2>
         <p class="entry-dek">For years we treated trust as the consequence of good governance. I increasingly think we have that backwards.</p>
         <p class="entry-meta">12 September 2026 · Digital Trust</p>
       </li>
 
-      <li class="entry-row idea">
+      <li class="entry-row idea" data-type="Idea">
         <p class="entry-kicker">Idea</p>
         <h2><a href="identity-for-agents.html">Identity stops being a human-control problem</a></h2>
         <p class="entry-dek">If most of the actions inside an enterprise are soon taken by agents rather than people, what does "identity" even mean anymore?</p>
         <p class="entry-meta">9 September 2026 · AI &amp; Agents</p>
       </li>
 
-      <li class="entry-row">
+      <li class="entry-row" data-type="Note">
         <p class="entry-kicker">Note · 1 min</p>
         <h2><a href="governance-theatre.html">Governance theatre</a></h2>
         <p class="entry-dek">A control that exists only to be shown to an auditor is not a control. It is a costume.</p>
@@ -60,6 +67,8 @@
       </li>
 
     </ul>
+
+    <p class="entry-meta" id="emptyState" style="display:none; padding:26px 0;">Nothing in this category yet.</p>
   </main>
 
   <footer class="site">
@@ -68,5 +77,31 @@
   </footer>
 
 </div>
+<script>
+(function () {
+  var links = document.querySelectorAll('.filters a');
+  var rows = document.querySelectorAll('.entry-list .entry-row');
+  var empty = document.getElementById('emptyState');
+
+  function applyFilter(type) {
+    var visible = 0;
+    rows.forEach(function (row) {
+      var show = type === 'all' || row.getAttribute('data-type') === type;
+      row.style.display = show ? '' : 'none';
+      if (show) visible++;
+    });
+    empty.style.display = visible === 0 ? '' : 'none';
+  }
+
+  links.forEach(function (link) {
+    link.addEventListener('click', function (e) {
+      e.preventDefault();
+      links.forEach(function (l) { l.classList.remove('active'); });
+      link.classList.add('active');
+      applyFilter(link.getAttribute('data-filter'));
+    });
+  });
+})();
+</script>
 </body>
 </html>
