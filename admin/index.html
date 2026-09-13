@@ -25,8 +25,9 @@
     font-size: 16px;
     line-height: 1.5;
   }
-  .wrap { max-width: 640px; margin: 0 auto; padding: 40px 20px 80px; }
+  .wrap { max-width: 680px; margin: 0 auto; padding: 40px 20px 80px; }
   h1 { font-family: var(--serif); font-size: 1.7rem; margin: 0 0 4px; }
+  h2.section { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-faint); margin: 0 0 12px; }
   .sub { color: var(--ink-soft); margin: 0 0 32px; font-size: 0.95rem; }
   a { color: var(--accent); }
   fieldset { border: none; padding: 0; margin: 0 0 28px; }
@@ -58,6 +59,8 @@
   .btn-primary { background: var(--accent); color: #fff; }
   .btn-primary:disabled { opacity: 0.5; cursor: default; }
   .btn-secondary { background: none; border: 1px solid var(--rule); color: var(--ink-soft); }
+  .btn-danger { background: none; border: 1px solid #d8b8b8; color: #8a2b2b; }
+  .btn-small { padding: 5px 10px; font-size: 0.78rem; font-weight: 600; }
   .checkbox-row { display: flex; align-items: center; gap: 8px; }
   .checkbox-row label { margin: 0; font-weight: 400; }
   #setup, #status { display: none; }
@@ -84,6 +87,18 @@
   .top-bar { display: flex; justify-content: space-between; align-items: baseline; }
   .token-state { font-size: 0.8rem; color: var(--ink-faint); }
   footer { margin-top: 40px; border-top: 1px solid var(--rule); padding-top: 16px; font-size: 0.8rem; color: var(--ink-faint); }
+
+  .post-list { list-style: none; margin: 0 0 32px; padding: 0; border: 1px solid var(--rule); border-radius: 6px; background: #fff; overflow: hidden; }
+  .post-row { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-bottom: 1px solid var(--rule); }
+  .post-row:last-child { border-bottom: none; }
+  .post-kicker { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--accent); width: 74px; flex: 0 0 auto; }
+  .post-title { flex: 1; font-size: 0.92rem; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .post-date { font-size: 0.78rem; color: var(--ink-faint); flex: 0 0 auto; }
+  .post-actions { display: flex; gap: 6px; flex: 0 0 auto; }
+  .empty-list { padding: 16px 14px; color: var(--ink-faint); font-size: 0.9rem; }
+  .form-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+  .editing-banner { background: #f0efe9; border-radius: 4px; padding: 8px 12px; font-size: 0.85rem; color: var(--ink-soft); margin-bottom: 16px; display: none; }
+  .editing-banner.show { display: block; }
 </style>
 </head>
 <body>
@@ -93,7 +108,7 @@
     <h1>Publish</h1>
     <span class="token-state" id="tokenState"></span>
   </div>
-  <p class="sub">Add a new Reflection, Note, or Idea to owladi.com.</p>
+  <p class="sub">Add, edit, or remove pieces on owladi.com.</p>
 
   <div id="setup">
     <h2>One-time setup</h2>
@@ -112,54 +127,67 @@
 
   <div id="status"></div>
 
-  <form id="entryForm">
-    <div class="row">
-      <label for="title">Title</label>
-      <input type="text" id="title" required placeholder="A working title for the piece">
+  <div id="mainArea" style="display:none;">
+    <h2 class="section">Your posts</h2>
+    <ul class="post-list" id="postList"></ul>
+
+    <div class="form-header">
+      <h2 class="section" style="margin:0;">New / edit post</h2>
+      <button type="button" class="btn-secondary btn-small" id="newPostBtn">+ New post</button>
     </div>
 
-    <div class="two-col row">
-      <div>
-        <label for="type">Format</label>
-        <select id="type">
-          <option value="Reflection">Reflection (long)</option>
-          <option value="Note">Note (short)</option>
-          <option value="Idea">Idea (a few sentences)</option>
-        </select>
+    <div class="editing-banner" id="editingBanner"></div>
+
+    <form id="entryForm">
+      <div class="row">
+        <label for="title">Title</label>
+        <input type="text" id="title" required placeholder="A working title for the piece">
       </div>
-      <div>
-        <label for="readTime">Read time (optional)</label>
-        <input type="text" id="readTime" placeholder="e.g. 3">
-        <p class="hint">Minutes. Leave blank to omit.</p>
+
+      <div class="two-col row">
+        <div>
+          <label for="type">Format</label>
+          <select id="type">
+            <option value="Reflection">Reflection (long)</option>
+            <option value="Note">Note (short)</option>
+            <option value="Idea">Idea (a few sentences)</option>
+          </select>
+        </div>
+        <div>
+          <label for="readTime">Read time (optional)</label>
+          <input type="text" id="readTime" placeholder="e.g. 3">
+          <p class="hint">Minutes. Leave blank to omit.</p>
+        </div>
       </div>
-    </div>
 
-    <div class="row">
-      <label for="topic">Topic (optional)</label>
-      <input type="text" id="topic" placeholder="e.g. Digital Trust">
-    </div>
+      <div class="row">
+        <label for="topic">Topic (optional)</label>
+        <input type="text" id="topic" placeholder="e.g. Digital Trust — leave blank, most pieces don't need one">
+      </div>
 
-    <div class="row">
-      <label for="dek">Standfirst / summary</label>
-      <textarea id="dek" style="min-height:60px;" required placeholder="One or two sentences shown in the listings."></textarea>
-    </div>
+      <div class="row">
+        <label for="dek">Standfirst / summary</label>
+        <textarea id="dek" style="min-height:60px;" required placeholder="One or two sentences shown in the listings."></textarea>
+      </div>
 
-    <div class="row">
-      <label for="body">Body</label>
-      <textarea id="body" required placeholder="Write the piece here. Leave a blank line between paragraphs."></textarea>
-    </div>
+      <div class="row">
+        <label for="body">Body</label>
+        <textarea id="body" required placeholder="Write the piece here. Leave a blank line between paragraphs."></textarea>
+      </div>
 
-    <div class="row checkbox-row">
-      <input type="checkbox" id="disclosure" checked>
-      <label for="disclosure">Include the "views are my own" disclosure line</label>
-    </div>
+      <div class="row checkbox-row">
+        <input type="checkbox" id="disclosure" checked>
+        <label for="disclosure">Include the "views are my own" disclosure line</label>
+      </div>
 
-    <button type="submit" class="btn-primary" id="publishBtn">Publish</button>
-    <button type="button" class="btn-secondary" id="forgetTokenBtn" style="margin-left:10px;">Forget saved token</button>
-  </form>
+      <button type="submit" class="btn-primary" id="publishBtn">Publish</button>
+      <button type="button" class="btn-secondary" id="cancelEditBtn" style="display:none;">Cancel</button>
+      <button type="button" class="btn-danger" id="deleteBtn" style="display:none;">Delete this post</button>
+    </form>
+  </div>
 
   <footer>
-    <p>This page commits directly to the <a href="https://github.com/RadUrdun/owladi-site" target="_blank" rel="noopener">owladi-site</a> repository's main branch. New pieces go live within a minute or two once GitHub Pages rebuilds. It adds the new entry to the homepage (keeping the latest 5) and to the full <a href="/reflections.html">Reflections</a> archive.</p>
+    <p>This page commits directly to the <a href="https://github.com/RadUrdun/owladi-site" target="_blank" rel="noopener">owladi-site</a> repository's main branch. Changes go live within a minute or two once GitHub Pages rebuilds. <span id="forgetTokenWrap">— <a href="#" id="forgetTokenBtn">forget saved token</a></span></p>
   </footer>
 
 </div>
@@ -176,8 +204,19 @@
   var setupEl = document.getElementById('setup');
   var statusEl = document.getElementById('status');
   var tokenStateEl = document.getElementById('tokenState');
+  var mainArea = document.getElementById('mainArea');
   var form = document.getElementById('entryForm');
   var publishBtn = document.getElementById('publishBtn');
+  var cancelEditBtn = document.getElementById('cancelEditBtn');
+  var deleteBtn = document.getElementById('deleteBtn');
+  var editingBanner = document.getElementById('editingBanner');
+  var postListEl = document.getElementById('postList');
+
+  var entries = null;       // array, loaded from entries.json
+  var entriesSha = null;    // sha of entries.json, for writing back
+  var editingIndex = -1;    // -1 = creating a new post
+
+  // ---------- token handling ----------
 
   function getToken() { return localStorage.getItem(TOKEN_KEY) || ''; }
 
@@ -185,11 +224,12 @@
     var t = getToken();
     if (t) {
       setupEl.style.display = 'none';
-      form.style.display = 'block';
+      mainArea.style.display = 'block';
       tokenStateEl.textContent = 'token saved';
+      loadPostList();
     } else {
       setupEl.style.display = 'block';
-      form.style.display = 'none';
+      mainArea.style.display = 'none';
       tokenStateEl.textContent = 'not set up';
     }
   }
@@ -203,7 +243,8 @@
     showStatus('ok', 'Token saved to this browser.');
   });
 
-  document.getElementById('forgetTokenBtn').addEventListener('click', function () {
+  document.getElementById('forgetTokenBtn').addEventListener('click', function (e) {
+    e.preventDefault();
     localStorage.removeItem(TOKEN_KEY);
     refreshTokenUI();
     showStatus('ok', 'Token removed from this browser.');
@@ -213,6 +254,8 @@
     statusEl.className = kind;
     statusEl.textContent = msg;
   }
+
+  // ---------- helpers ----------
 
   function escapeHtml(s) {
     return String(s)
@@ -227,6 +270,14 @@
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/^-+|-+$/g, '')
       .slice(0, 80) || 'entry';
+  }
+
+  function uniqueSlug(base) {
+    var existing = entries.map(function (e) { return e.slug; });
+    if (existing.indexOf(base) === -1) return base;
+    var n = 2;
+    while (existing.indexOf(base + '-' + n) !== -1) n++;
+    return base + '-' + n;
   }
 
   function formatDate(d) {
@@ -254,52 +305,52 @@
     };
   }
 
-  function getFile(path) {
-    return fetch(API + '/repos/' + OWNER + '/' + REPO + '/contents/' + path + '?ref=' + BRANCH, { headers: ghHeaders() })
-      .then(function (res) {
-        if (!res.ok) throw new Error('Could not read ' + path + ' (' + res.status + ')');
-        return res.json();
-      })
-      .then(function (json) {
-        return { sha: json.sha, content: b64DecodeUnicode(json.content.replace(/\n/g, '')) };
-      });
+  async function getFile(path) {
+    var res = await fetch(API + '/repos/' + OWNER + '/' + REPO + '/contents/' + path + '?ref=' + BRANCH, { headers: ghHeaders() });
+    if (res.status === 404) return null;
+    if (!res.ok) throw new Error('Could not read ' + path + ' (' + res.status + ')');
+    var json = await res.json();
+    return { sha: json.sha, content: b64DecodeUnicode(json.content.replace(/\n/g, '')) };
   }
 
-  function putFile(path, content, sha, message) {
-    var body = {
-      message: message,
-      content: b64EncodeUnicode(content),
-      branch: BRANCH
-    };
+  async function putFile(path, content, sha, message) {
+    var body = { message: message, content: b64EncodeUnicode(content), branch: BRANCH };
     if (sha) body.sha = sha;
-    return fetch(API + '/repos/' + OWNER + '/' + REPO + '/contents/' + path, {
-      method: 'PUT',
-      headers: ghHeaders(),
-      body: JSON.stringify(body)
-    }).then(function (res) {
-      if (!res.ok) {
-        return res.json().catch(function () { return {}; }).then(function (j) {
-          throw new Error('Failed to write ' + path + ' (' + res.status + '): ' + (j.message || 'unknown error'));
-        });
-      }
-      return res.json();
+    var res = await fetch(API + '/repos/' + OWNER + '/' + REPO + '/contents/' + path, {
+      method: 'PUT', headers: ghHeaders(), body: JSON.stringify(body)
     });
+    if (!res.ok) {
+      var j = await res.json().catch(function () { return {}; });
+      throw new Error('Failed to write ' + path + ' (' + res.status + '): ' + (j.message || 'unknown error'));
+    }
+    return res.json();
   }
 
-  function paragraphs(body) {
+  async function deleteFile(path, sha, message) {
+    var res = await fetch(API + '/repos/' + OWNER + '/' + REPO + '/contents/' + path, {
+      method: 'DELETE', headers: ghHeaders(), body: JSON.stringify({ message: message, sha: sha, branch: BRANCH })
+    });
+    if (!res.ok && res.status !== 404) {
+      var j = await res.json().catch(function () { return {}; });
+      throw new Error('Failed to delete ' + path + ' (' + res.status + '): ' + (j.message || 'unknown error'));
+    }
+  }
+
+  function paragraphsHtml(body) {
     return body.split(/\n\s*\n/).map(function (p) { return p.trim(); }).filter(Boolean)
       .map(function (p) { return '      <p>' + escapeHtml(p).replace(/\n/g, ' ') + '</p>'; })
       .join('\n\n');
   }
 
-  function buildEntryPage(opts) {
-    var kicker = opts.type;
-    var metaParts = [opts.dateStr];
-    if (opts.topic) metaParts.push(opts.topic);
-    if (opts.readTime) metaParts.push(opts.readTime + ' min read');
-    var meta = metaParts.join(' &middot; ').replace(/&middot;/g, '·');
+  // ---------- page builders (all pages are generated fresh from `entries`) ----------
 
-    var disclosureHtml = opts.disclosure ?
+  function buildEntryPage(e) {
+    var metaParts = [e.dateStr];
+    if (e.topic) metaParts.push(e.topic);
+    if (e.readTime) metaParts.push(e.readTime + ' min read');
+    var meta = metaParts.join(' · ');
+
+    var disclosureHtml = e.disclosure ?
       '\n      <div class="disclosure">\n        <p>Personal reflection. Views are my own and not those of my employer.</p>\n      </div>' : '';
 
     return '<!DOCTYPE html>\n' +
@@ -307,21 +358,21 @@
 '<head>\n' +
 '<meta charset="UTF-8">\n' +
 '<meta name="viewport" content="width=device-width, initial-scale=1.0">\n' +
-'<title>' + escapeHtml(opts.title) + ' — Raddad Ayoub</title>\n' +
-'<meta name="description" content="' + escapeHtml(opts.dek) + '">\n' +
+'<title>' + escapeHtml(e.title) + ' — Raddad Ayoub</title>\n' +
+'<meta name="description" content="' + escapeHtml(e.dek) + '">\n' +
 '<link rel="icon" href="/favicon.svg" type="image/svg+xml">\n' +
 '<link rel="icon" href="/favicon.ico" sizes="any">\n' +
 '<link rel="apple-touch-icon" href="/apple-touch-icon.png">\n' +
-'<link rel="canonical" href="https://owladi.com/' + opts.slug + '.html">\n' +
+'<link rel="canonical" href="https://owladi.com/' + e.slug + '.html">\n' +
 '<meta property="og:type" content="article">\n' +
 '<meta property="og:site_name" content="Raddad Ayoub">\n' +
-'<meta property="og:title" content="' + escapeHtml(opts.title) + '">\n' +
-'<meta property="og:description" content="' + escapeHtml(opts.dek) + '">\n' +
-'<meta property="og:url" content="https://owladi.com/' + opts.slug + '.html">\n' +
+'<meta property="og:title" content="' + escapeHtml(e.title) + '">\n' +
+'<meta property="og:description" content="' + escapeHtml(e.dek) + '">\n' +
+'<meta property="og:url" content="https://owladi.com/' + e.slug + '.html">\n' +
 '<meta property="og:image" content="https://owladi.com/og-image.png">\n' +
 '<meta name="twitter:card" content="summary_large_image">\n' +
-'<meta name="twitter:title" content="' + escapeHtml(opts.title) + '">\n' +
-'<meta name="twitter:description" content="' + escapeHtml(opts.dek) + '">\n' +
+'<meta name="twitter:title" content="' + escapeHtml(e.title) + '">\n' +
+'<meta name="twitter:description" content="' + escapeHtml(e.dek) + '">\n' +
 '<meta name="twitter:image" content="https://owladi.com/og-image.png">\n' +
 '<link rel="stylesheet" href="style.css">\n' +
 '</head>\n' +
@@ -338,10 +389,10 @@
 '  </header>\n\n' +
 '  <main>\n' +
 '    <article class="entry">\n' +
-'      <p class="entry-kicker">' + escapeHtml(kicker) + '</p>\n' +
-'      <h1>' + escapeHtml(opts.title) + '</h1>\n' +
+'      <p class="entry-kicker">' + escapeHtml(e.type) + '</p>\n' +
+'      <h1>' + escapeHtml(e.title) + '</h1>\n' +
 '      <p class="entry-meta">' + meta + '</p>\n\n' +
-paragraphs(opts.body) + '\n' +
+paragraphsHtml(e.body) + '\n' +
 disclosureHtml + '\n' +
 '    </article>\n\n' +
 '    <p><a class="back-link" href="/reflections.html">← All reflections</a></p>\n' +
@@ -354,20 +405,146 @@ disclosureHtml + '\n' +
 '</html>\n';
   }
 
-  function buildListItem(opts, forHomepage) {
-    var kickerBits = [opts.type];
-    var showTime = opts.readTime && opts.type !== 'Idea';
-    var kicker = showTime ? opts.type + ' · ' + opts.readTime + ' min' : opts.type;
-    var rowClass = opts.type === 'Idea' ? 'entry-row idea' : 'entry-row';
-    var href = forHomepage ? '/' + opts.slug + '.html' : opts.slug + '.html';
-    var metaText = forHomepage ? opts.dateStr : (opts.topic ? opts.dateStr + ' · ' + opts.topic : opts.dateStr);
+  function buildListItem(e, forHomepage) {
+    var showTime = e.readTime && e.type !== 'Idea';
+    var kicker = showTime ? e.type + ' · ' + e.readTime + ' min' : e.type;
+    var rowClass = e.type === 'Idea' ? 'entry-row idea' : 'entry-row';
+    var href = forHomepage ? '/' + e.slug + '.html' : e.slug + '.html';
+    var metaText = forHomepage ? e.dateStr : (e.topic ? e.dateStr + ' · ' + e.topic : e.dateStr);
 
-    return '      <li class="' + rowClass + '" data-type="' + opts.type + '">\n' +
+    return '      <li class="' + rowClass + '" data-type="' + e.type + '">\n' +
 '        <p class="entry-kicker">' + escapeHtml(kicker) + '</p>\n' +
-'        <h2><a href="' + href + '">' + escapeHtml(opts.title) + '</a></h2>\n' +
-'        <p class="entry-dek">' + escapeHtml(opts.dek) + '</p>\n' +
+'        <h2><a href="' + href + '">' + escapeHtml(e.title) + '</a></h2>\n' +
+'        <p class="entry-dek">' + escapeHtml(e.dek) + '</p>\n' +
 '        <p class="entry-meta">' + metaText + '</p>\n' +
 '      </li>';
+  }
+
+  var TAGLINE = 'Reflections on trust, technology, organisations, poetry, art, and other things I am still trying to understand.';
+
+  function buildIndexPage(allEntries) {
+    var shown = allEntries.slice(0, HOMEPAGE_MAX);
+    var list = shown.length
+      ? shown.map(function (e) { return buildListItem(e, true); }).join('\n\n')
+      : '      <li class="entry-row"><p class="entry-dek">Nothing published yet.</p></li>';
+
+    return '<!DOCTYPE html>\n<html lang="en">\n<head>\n' +
+'<meta charset="UTF-8">\n<meta name="viewport" content="width=device-width, initial-scale=1.0">\n' +
+'<title>Raddad Ayoub</title>\n' +
+'<meta name="description" content="' + TAGLINE + '">\n' +
+'<link rel="icon" href="/favicon.svg" type="image/svg+xml">\n' +
+'<link rel="icon" href="/favicon.ico" sizes="any">\n' +
+'<link rel="apple-touch-icon" href="/apple-touch-icon.png">\n' +
+'<link rel="canonical" href="https://owladi.com/">\n' +
+'<meta property="og:type" content="website">\n' +
+'<meta property="og:site_name" content="Raddad Ayoub">\n' +
+'<meta property="og:title" content="Raddad Ayoub">\n' +
+'<meta property="og:description" content="' + TAGLINE + '">\n' +
+'<meta property="og:url" content="https://owladi.com/">\n' +
+'<meta property="og:image" content="https://owladi.com/og-image.png">\n' +
+'<meta name="twitter:card" content="summary_large_image">\n' +
+'<meta name="twitter:title" content="Raddad Ayoub">\n' +
+'<meta name="twitter:description" content="' + TAGLINE + '">\n' +
+'<meta name="twitter:image" content="https://owladi.com/og-image.png">\n' +
+'<link rel="stylesheet" href="style.css">\n' +
+'</head>\n<body>\n<div class="wrap">\n\n' +
+'  <header class="site">\n' +
+'    <p class="name"><a href="/">Raddad Ayoub</a></p>\n' +
+'    <p class="tagline">' + TAGLINE + '</p>\n' +
+'    <nav class="site">\n' +
+'      <a href="/reflections.html" class="current">Reflections</a>\n' +
+'      <a href="/writing.html">Writing</a>\n' +
+'      <a href="/speaking.html">Speaking</a>\n' +
+'      <a href="/about.html">About</a>\n' +
+'    </nav>\n' +
+'  </header>\n\n' +
+'  <main>\n' +
+'    <ul class="entry-list">\n\n' + list + '\n\n    </ul>\n\n' +
+'    <p style="margin-top:36px;"><a class="back-link" href="/reflections.html">All reflections →</a></p>\n' +
+'  </main>\n\n' +
+'  <footer class="site">\n' +
+'    <p>Raddad Ayoub</p>\n' +
+'    <p>Personal reflections. Views are my own, not my employer\'s.</p>\n' +
+'  </footer>\n\n' +
+'</div>\n</body>\n</html>\n';
+  }
+
+  function buildReflectionsPage(allEntries) {
+    var desc = "Short reflections, notes, and ideas — on trust, technology, organisations, poetry, art, and whatever else I'm noticing and thinking about.";
+    var list = allEntries.length
+      ? allEntries.map(function (e) { return buildListItem(e, false); }).join('\n\n')
+      : '      <li class="entry-row"><p class="entry-dek">Nothing published yet.</p></li>';
+
+    return '<!DOCTYPE html>\n<html lang="en">\n<head>\n' +
+'<meta charset="UTF-8">\n<meta name="viewport" content="width=device-width, initial-scale=1.0">\n' +
+'<title>Reflections — Raddad Ayoub</title>\n' +
+'<meta name="description" content="' + desc + '">\n' +
+'<link rel="icon" href="/favicon.svg" type="image/svg+xml">\n' +
+'<link rel="icon" href="/favicon.ico" sizes="any">\n' +
+'<link rel="apple-touch-icon" href="/apple-touch-icon.png">\n' +
+'<link rel="canonical" href="https://owladi.com/reflections.html">\n' +
+'<meta property="og:type" content="website">\n' +
+'<meta property="og:site_name" content="Raddad Ayoub">\n' +
+'<meta property="og:title" content="Reflections — Raddad Ayoub">\n' +
+'<meta property="og:description" content="' + desc + '">\n' +
+'<meta property="og:url" content="https://owladi.com/reflections.html">\n' +
+'<meta property="og:image" content="https://owladi.com/og-image.png">\n' +
+'<meta name="twitter:card" content="summary_large_image">\n' +
+'<meta name="twitter:title" content="Reflections — Raddad Ayoub">\n' +
+'<meta name="twitter:description" content="' + desc + '">\n' +
+'<meta name="twitter:image" content="https://owladi.com/og-image.png">\n' +
+'<link rel="stylesheet" href="style.css">\n' +
+'</head>\n<body>\n<div class="wrap">\n\n' +
+'  <header class="site">\n' +
+'    <p class="name"><a href="/">Raddad Ayoub</a></p>\n' +
+'    <p class="tagline">' + TAGLINE + '</p>\n' +
+'    <nav class="site">\n' +
+'      <a href="/reflections.html" class="current">Reflections</a>\n' +
+'      <a href="/writing.html">Writing</a>\n' +
+'      <a href="/speaking.html">Speaking</a>\n' +
+'      <a href="/about.html">About</a>\n' +
+'    </nav>\n' +
+'  </header>\n\n' +
+'  <main>\n' +
+'    <p class="filters">\n' +
+'      <a href="#" class="active" data-filter="all">All</a>\n' +
+'      <a href="#" data-filter="Reflection">Reflections</a>\n' +
+'      <a href="#" data-filter="Note">Notes</a>\n' +
+'      <a href="#" data-filter="Idea">Ideas</a>\n' +
+'    </p>\n\n' +
+'    <ul class="entry-list">\n\n' + list + '\n\n    </ul>\n\n' +
+'    <p class="entry-meta" id="emptyState" style="display:none; padding:26px 0;">Nothing in this category yet.</p>\n' +
+'  </main>\n\n' +
+'  <footer class="site">\n' +
+'    <p>Raddad Ayoub</p>\n' +
+'    <p>Personal reflections. Views are my own, not my employer\'s.</p>\n' +
+'  </footer>\n\n' +
+'</div>\n' +
+'<script>\n' +
+"(function () {\n" +
+"  var links = document.querySelectorAll('.filters a');\n" +
+"  var rows = document.querySelectorAll('.entry-list .entry-row');\n" +
+"  var empty = document.getElementById('emptyState');\n" +
+"  function applyFilter(type) {\n" +
+"    var visible = 0;\n" +
+"    rows.forEach(function (row) {\n" +
+"      var show = type === 'all' || row.getAttribute('data-type') === type;\n" +
+"      row.style.display = show ? '' : 'none';\n" +
+"      if (show) visible++;\n" +
+"    });\n" +
+"    empty.style.display = visible === 0 ? '' : 'none';\n" +
+"  }\n" +
+"  links.forEach(function (link) {\n" +
+"    link.addEventListener('click', function (e) {\n" +
+"      e.preventDefault();\n" +
+"      links.forEach(function (l) { l.classList.remove('active'); });\n" +
+"      link.classList.add('active');\n" +
+"      applyFilter(link.getAttribute('data-filter'));\n" +
+"    });\n" +
+"  });\n" +
+"})();\n" +
+'<\/script>\n' +
+'</body>\n</html>\n';
   }
 
   function insertSitemapUrl(xml, url) {
@@ -378,93 +555,202 @@ disclosureHtml + '\n' +
     return xml.slice(0, idx) + entry + xml.slice(idx);
   }
 
-  function insertIntoList(html, listItemHtml, cap) {
-    var openTag = '<ul class="entry-list">';
-    var closeTag = '</ul>';
-    var start = html.indexOf(openTag);
-    var end = html.indexOf(closeTag, start);
-    if (start === -1 || end === -1) throw new Error('Could not find entry-list in page');
-
-    var before = html.slice(0, start + openTag.length);
-    var after = html.slice(end);
-    var inner = html.slice(start + openTag.length, end);
-
-    var items = inner.split(/(?=<li class="entry-row)/).map(function (s) { return s.trim(); }).filter(Boolean);
-    items.unshift(listItemHtml.trim());
-
-    if (cap && items.length > cap) items = items.slice(0, cap);
-
-    var rebuilt = '\n\n' + items.map(function (it) { return '      ' + it; }).join('\n\n') + '\n\n    ';
-    return before + rebuilt + after;
+  function removeSitemapUrl(xml, url) {
+    var line = '  <url><loc>' + url + '</loc></url>\n';
+    return xml.split(line).join('');
   }
 
-  form.addEventListener('submit', function (e) {
-    e.preventDefault();
-    publishBtn.disabled = true;
-    showStatus('busy', 'Publishing…');
+  // ---------- post list UI ----------
 
+  async function loadPostList() {
+    showStatus('busy', 'Loading your posts…');
     try {
-      var title = document.getElementById('title').value.trim();
-      var type = document.getElementById('type').value;
-      var readTime = document.getElementById('readTime').value.trim();
-      var topic = document.getElementById('topic').value.trim();
-      var dek = document.getElementById('dek').value.trim();
-      var body = document.getElementById('body').value.trim();
-      var disclosure = document.getElementById('disclosure').checked;
-
-      if (!title || !dek || !body) {
-        showStatus('err', 'Title, standfirst, and body are all required.');
-        publishBtn.disabled = false;
-        return;
+      var file = await getFile('entries.json');
+      if (!file) {
+        entries = [];
+        entriesSha = null;
+      } else {
+        entries = JSON.parse(file.content).entries || [];
+        entriesSha = file.sha;
       }
-
-      var slug = slugify(title);
-      var path = slug + '.html';
-      var dateStr = formatDate(new Date());
-
-      var opts = { title: title, type: type, readTime: readTime, topic: topic, dek: dek, body: body, disclosure: disclosure, slug: slug, dateStr: dateStr };
-      var entryHtml = buildEntryPage(opts);
-
-      putFile(path, entryHtml, null, 'Add entry: ' + title)
-        .then(function () {
-          showStatus('busy', 'Entry page created. Updating homepage…');
-          return getFile('index.html');
-        })
-        .then(function (idx) {
-          var updated = insertIntoList(idx.content, buildListItem(opts, true), HOMEPAGE_MAX);
-          return putFile('index.html', updated, idx.sha, 'Update homepage: ' + title);
-        })
-        .then(function () {
-          showStatus('busy', 'Homepage updated. Updating reflections archive…');
-          return getFile('reflections.html');
-        })
-        .then(function (refl) {
-          var updated = insertIntoList(refl.content, buildListItem(opts, false), null);
-          return putFile('reflections.html', updated, refl.sha, 'Update reflections archive: ' + title);
-        })
-        .then(function () {
-          showStatus('busy', 'Reflections archive updated. Updating sitemap…');
-          return getFile('sitemap.xml').catch(function () { return null; });
-        })
-        .then(function (sm) {
-          if (!sm) return;
-          var updated = insertSitemapUrl(sm.content, 'https://owladi.com/' + slug + '.html');
-          return putFile('sitemap.xml', updated, sm.sha, 'Update sitemap: ' + title);
-        })
-        .then(function () {
-          showStatus('ok', 'Published. "' + title + '" is live at owladi.com/' + slug + '.html within a minute or two.');
-          form.reset();
-          document.getElementById('disclosure').checked = true;
-        })
-        .catch(function (err) {
-          showStatus('err', err.message + '\n\nIf the entry page was created but a listing update failed, you can safely try publishing again after fixing the issue — just note the entry page already exists, so change the title slightly or edit the listing pages by hand this once.');
-        })
-        .finally(function () {
-          publishBtn.disabled = false;
-        });
+      renderPostList();
+      statusEl.className = '';
+      statusEl.style.display = 'none';
     } catch (err) {
       showStatus('err', err.message);
+    }
+  }
+
+  function renderPostList() {
+    postListEl.innerHTML = '';
+    if (!entries.length) {
+      var li = document.createElement('li');
+      li.className = 'empty-list';
+      li.textContent = 'No posts yet — use the form below to publish your first one.';
+      postListEl.appendChild(li);
+      return;
+    }
+    entries.forEach(function (e, i) {
+      var li = document.createElement('li');
+      li.className = 'post-row';
+      li.innerHTML =
+        '<span class="post-kicker">' + escapeHtml(e.type) + '</span>' +
+        '<span class="post-title">' + escapeHtml(e.title) + '</span>' +
+        '<span class="post-date">' + escapeHtml(e.dateStr) + '</span>' +
+        '<span class="post-actions"><button type="button" class="btn-secondary btn-small" data-edit="' + i + '">Edit</button></span>';
+      postListEl.appendChild(li);
+    });
+    postListEl.querySelectorAll('[data-edit]').forEach(function (btn) {
+      btn.addEventListener('click', function () { startEdit(parseInt(btn.getAttribute('data-edit'), 10)); });
+    });
+  }
+
+  function startEdit(index) {
+    editingIndex = index;
+    var e = entries[index];
+    document.getElementById('title').value = e.title;
+    document.getElementById('type').value = e.type;
+    document.getElementById('readTime').value = e.readTime || '';
+    document.getElementById('topic').value = e.topic || '';
+    document.getElementById('dek').value = e.dek;
+    document.getElementById('body').value = e.body;
+    document.getElementById('disclosure').checked = !!e.disclosure;
+
+    editingBanner.textContent = 'Editing "' + e.title + '" — the URL (owladi.com/' + e.slug + '.html) and original date stay the same.';
+    editingBanner.classList.add('show');
+    publishBtn.textContent = 'Save changes';
+    cancelEditBtn.style.display = 'inline-block';
+    deleteBtn.style.display = 'inline-block';
+    window.scrollTo({ top: form.offsetTop - 20, behavior: 'smooth' });
+  }
+
+  function startNew() {
+    editingIndex = -1;
+    form.reset();
+    document.getElementById('disclosure').checked = true;
+    editingBanner.classList.remove('show');
+    publishBtn.textContent = 'Publish';
+    cancelEditBtn.style.display = 'none';
+    deleteBtn.style.display = 'none';
+  }
+
+  document.getElementById('newPostBtn').addEventListener('click', startNew);
+  cancelEditBtn.addEventListener('click', startNew);
+
+  // ---------- publish / save ----------
+
+  async function regenerateListingPages(allEntries, label) {
+    showStatus('busy', 'Updating homepage…');
+    var idx = await getFile('index.html');
+    await putFile('index.html', buildIndexPage(allEntries), idx ? idx.sha : null, 'Update homepage: ' + label);
+
+    showStatus('busy', 'Updating reflections archive…');
+    var refl = await getFile('reflections.html');
+    await putFile('reflections.html', buildReflectionsPage(allEntries), refl ? refl.sha : null, 'Update reflections archive: ' + label);
+  }
+
+  async function saveEntriesJson(label) {
+    var res = await putFile('entries.json', JSON.stringify({ entries: entries }, null, 2), entriesSha, 'Update entries.json: ' + label);
+    entriesSha = res.content.sha;
+  }
+
+  form.addEventListener('submit', async function (e) {
+    e.preventDefault();
+    publishBtn.disabled = true;
+
+    var title = document.getElementById('title').value.trim();
+    var type = document.getElementById('type').value;
+    var readTime = document.getElementById('readTime').value.trim();
+    var topic = document.getElementById('topic').value.trim();
+    var dek = document.getElementById('dek').value.trim();
+    var body = document.getElementById('body').value.trim();
+    var disclosure = document.getElementById('disclosure').checked;
+
+    if (!title || !dek || !body) {
+      showStatus('err', 'Title, standfirst, and body are all required.');
       publishBtn.disabled = false;
+      return;
+    }
+
+    var isNew = editingIndex === -1;
+
+    try {
+      var entry;
+      if (isNew) {
+        var slug = uniqueSlug(slugify(title));
+        entry = { slug: slug, title: title, type: type, readTime: readTime, topic: topic, dek: dek, body: body, disclosure: disclosure, dateStr: formatDate(new Date()) };
+      } else {
+        var existing = entries[editingIndex];
+        entry = { slug: existing.slug, title: title, type: type, readTime: readTime, topic: topic, dek: dek, body: body, disclosure: disclosure, dateStr: existing.dateStr };
+      }
+
+      showStatus('busy', (isNew ? 'Creating' : 'Updating') + ' entry page…');
+      var existingFile = await getFile(entry.slug + '.html');
+      await putFile(entry.slug + '.html', buildEntryPage(entry), existingFile ? existingFile.sha : null, (isNew ? 'Add entry: ' : 'Edit entry: ') + entry.title);
+
+      if (isNew) {
+        entries.unshift(entry);
+      } else {
+        entries[editingIndex] = entry;
+      }
+
+      await regenerateListingPages(entries, entry.title);
+
+      if (isNew) {
+        showStatus('busy', 'Updating sitemap…');
+        var sm = await getFile('sitemap.xml');
+        if (sm) {
+          await putFile('sitemap.xml', insertSitemapUrl(sm.content, 'https://owladi.com/' + entry.slug + '.html'), sm.sha, 'Update sitemap: ' + entry.title);
+        }
+      }
+
+      showStatus('busy', 'Saving post index…');
+      await saveEntriesJson(entry.title);
+
+      showStatus('ok', (isNew ? 'Published. "' : 'Saved. "') + entry.title + '" is live at owladi.com/' + entry.slug + '.html within a minute or two.');
+      renderPostList();
+      startNew();
+    } catch (err) {
+      showStatus('err', err.message);
+    } finally {
+      publishBtn.disabled = false;
+    }
+  });
+
+  // ---------- delete ----------
+
+  deleteBtn.addEventListener('click', async function () {
+    if (editingIndex === -1) return;
+    var entry = entries[editingIndex];
+    if (!confirm('Delete "' + entry.title + '" permanently? This removes its page and takes it off the homepage and archive.')) return;
+
+    deleteBtn.disabled = true;
+    try {
+      showStatus('busy', 'Deleting entry page…');
+      var file = await getFile(entry.slug + '.html');
+      if (file) await deleteFile(entry.slug + '.html', file.sha, 'Delete entry: ' + entry.title);
+
+      entries.splice(editingIndex, 1);
+
+      await regenerateListingPages(entries, entry.title);
+
+      showStatus('busy', 'Updating sitemap…');
+      var sm = await getFile('sitemap.xml');
+      if (sm) {
+        var updated = removeSitemapUrl(sm.content, 'https://owladi.com/' + entry.slug + '.html');
+        if (updated !== sm.content) await putFile('sitemap.xml', updated, sm.sha, 'Remove from sitemap: ' + entry.title);
+      }
+
+      showStatus('busy', 'Saving post index…');
+      await saveEntriesJson('delete ' + entry.title);
+
+      showStatus('ok', '"' + entry.title + '" was deleted.');
+      renderPostList();
+      startNew();
+    } catch (err) {
+      showStatus('err', err.message);
+    } finally {
+      deleteBtn.disabled = false;
     }
   });
 
