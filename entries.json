@@ -1,0 +1,37 @@
+{
+  "entries": [
+    {
+      "slug": "trust-as-an-engineering-discipline",
+      "title": "Trust is becoming an engineering discipline",
+      "type": "Reflection",
+      "dek": "For years we treated trust as the consequence of good governance. I increasingly think we have that backwards.",
+      "topic": "Digital Trust",
+      "readTime": "3",
+      "dateStr": "12 September 2026",
+      "disclosure": true,
+      "body": "For years we treated trust as the consequence of good governance: write the policy, run the audit, produce the certificate, and trust follows as a downstream effect. That model made sense when the things being trusted were slow-moving — a process, a department, an annual filing.\n\nI increasingly think we have that backwards. In organisations where AI systems and autonomous agents are doing an ever larger share of the actual work, trust can no longer be a certificate issued once a year. It has to be architected into the system itself: who can act, under what conditions, with what evidence left behind, and what happens automatically when something goes outside the expected pattern.\n\nThat is a different discipline from governance as we have practised it. Governance asks \"did we follow the process.\" Engineered trust asks \"can the system demonstrate, continuously and on its own, that it is behaving as intended\" — and if it can't demonstrate that, does it fail safely rather than fail invisibly.\n\nNone of this replaces governance. It gives governance something to point at other than a policy document: instrumentation, logging, attestations, real-time controls that are load-bearing rather than decorative. The organisations that get comfortable with this shift early will find that trust becomes something they can show, not just something they can claim.\n\nI don't think this is fully worked out yet, even in my own head. But the direction feels right: less \"trust us because we followed the rules,\" more \"trust the system because you can see it proving itself.\""
+    },
+    {
+      "slug": "identity-for-agents",
+      "title": "Identity stops being a human-control problem",
+      "type": "Idea",
+      "dek": "If most of the actions inside an enterprise are soon taken by agents rather than people, what does \"identity\" even mean anymore?",
+      "topic": "AI & Agents",
+      "readTime": "",
+      "dateStr": "9 September 2026",
+      "disclosure": true,
+      "body": "Most identity and access frameworks were built on a quiet assumption: the actor behind a login is a person, and a person can be trained, warned, or fired. Once a meaningful share of actions inside an enterprise are taken by autonomous agents instead, that assumption stops holding.\n\nAn agent doesn't get \"trained\" in the disciplinary sense, and it can act at a speed and volume no human reviewer can shadow in real time. So what replaces the old controls — behavioural baselining? Revocable, scoped credentials issued per task rather than per person? Something else entirely?\n\nWorth sitting with rather than answering too quickly."
+    },
+    {
+      "slug": "governance-theatre",
+      "title": "Governance theatre",
+      "type": "Note",
+      "dek": "A control that exists only to be shown to an auditor is not a control. It is a costume.",
+      "topic": "Governance",
+      "readTime": "1",
+      "dateStr": "4 September 2026",
+      "disclosure": true,
+      "body": "A control that exists only to be shown to an auditor is not a control. It is a costume.\n\nThe test I keep coming back to: would this control still run, in the same way, if no one outside the team ever asked to see it? If the honest answer is no, it isn't protecting the organisation — it's protecting the appearance of the organisation, which is a different job entirely, and a more dangerous one, because it's easy to mistake for the real thing."
+    }
+  ]
+}
