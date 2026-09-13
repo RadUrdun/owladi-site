@@ -261,7 +261,9 @@
     return String(s)
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;');
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
   }
 
   function slugify(s) {
@@ -269,7 +271,15 @@
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/^-+|-+$/g, '')
-      .slice(0, 80) || 'entry';
+      .slice(0, 80);
+  }
+
+  // Titles with no Latin/number characters (Arabic, etc.) slugify to '' —
+  // fall back to a short, readable, date-based slug instead of a generic one.
+  function fallbackSlug(type, dateObj) {
+    var months = ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
+    var d = dateObj || new Date();
+    return (type || 'post').toLowerCase() + '-' + d.getFullYear() + '-' + months[d.getMonth()] + '-' + String(d.getDate()).padStart(2, '0');
   }
 
   function uniqueSlug(base) {
@@ -345,9 +355,9 @@
   // ---------- page builders (all pages are generated fresh from `entries`) ----------
 
   function buildEntryPage(e) {
-    var metaParts = [e.dateStr];
-    if (e.topic) metaParts.push(e.topic);
-    if (e.readTime) metaParts.push(e.readTime + ' min read');
+    var metaParts = [escapeHtml(e.dateStr)];
+    if (e.topic) metaParts.push(escapeHtml(e.topic));
+    if (e.readTime) metaParts.push(escapeHtml(e.readTime) + ' min read');
     var meta = metaParts.join(' · ');
 
     var disclosureHtml = e.disclosure ?
@@ -410,7 +420,7 @@ disclosureHtml + '\n' +
     var kicker = showTime ? e.type + ' · ' + e.readTime + ' min' : e.type;
     var rowClass = e.type === 'Idea' ? 'entry-row idea' : 'entry-row';
     var href = forHomepage ? '/' + e.slug + '.html' : e.slug + '.html';
-    var metaText = forHomepage ? e.dateStr : (e.topic ? e.dateStr + ' · ' + e.topic : e.dateStr);
+    var metaText = forHomepage ? escapeHtml(e.dateStr) : (e.topic ? escapeHtml(e.dateStr) + ' · ' + escapeHtml(e.topic) : escapeHtml(e.dateStr));
 
     return '      <li class="' + rowClass + '" data-type="' + e.type + '">\n' +
 '        <p class="entry-kicker">' + escapeHtml(kicker) + '</p>\n' +
@@ -677,8 +687,10 @@ disclosureHtml + '\n' +
     try {
       var entry;
       if (isNew) {
-        var slug = uniqueSlug(slugify(title));
-        entry = { slug: slug, title: title, type: type, readTime: readTime, topic: topic, dek: dek, body: body, disclosure: disclosure, dateStr: formatDate(new Date()) };
+        var now = new Date();
+        var base = slugify(title) || fallbackSlug(type, now);
+        var slug = uniqueSlug(base);
+        entry = { slug: slug, title: title, type: type, readTime: readTime, topic: topic, dek: dek, body: body, disclosure: disclosure, dateStr: formatDate(now) };
       } else {
         var existing = entries[editingIndex];
         entry = { slug: existing.slug, title: title, type: type, readTime: readTime, topic: topic, dek: dek, body: body, disclosure: disclosure, dateStr: existing.dateStr };
